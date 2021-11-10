@@ -34,7 +34,7 @@ device = 'cpu'
 config_id = str(os.getcwd()).split()[-1]
 startTime = time.time()
 
-lr = 0.1
+lr = 0.0000000001
 
 epoch = 10000
 

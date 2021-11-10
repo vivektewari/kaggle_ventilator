@@ -40,7 +40,7 @@ class MetricsCallback(Callback):
 
 
     def on_epoch_start(self, state: Runner):
-        if (state.stage_epoch_step -1) % 10 == 0: self.change_rc_seq(state)
+        if (state.stage_epoch_step -1) % 100 == 0: self.change_rc_seq(state)
     def on_epoch_end(self, state: Runner):
 
         """Event handler for epoch end.
@@ -71,14 +71,14 @@ class MetricsCallback(Callback):
 
     def iter_choice(self):
         if self.rc_seq == 8:
-            rc_seq = 0
+            self.rc_seq = 0
             self.all_loop += self.loop
         else:
-            rc_seq = self.rc_seq + 1
+            self.rc_seq = self.rc_seq + 1
 
-        train_set = [0, 1]  # [i for i in range(9)]#[6,8]#
-        #if rc_seq not in train_set: self.iter_choice()
-        self.rc_seq = rc_seq
+        train_set = [6,8]  # [i for i in range(9)]#[6,8]#
+        if self.rc_seq not in train_set: self.iter_choice()
+
     def change_rc_seq(self,state):
 
         if self.directory is not None : torch.save(state.model.state_dict(),
@@ -86,9 +86,17 @@ class MetricsCallback(Callback):
                                                                          self.model_name + "_" + str(
                                                                                 self.all_loop ) + ".pth")
         #self.count_looper[self.rc_seq] = self.loop
-        self.select_rc_seq()
-        state.optimizer.l
-        #self.iter_choice()
+        #self.select_rc_seq()
+        self.iter_choice()
+        if self.loss_dict[self.rc_seq]>1.2:
+            state.optimizer.param_groups[0]['lr']=1
+        elif self.loss_dict[self.rc_seq]>0.5:
+            state.optimizer.param_groups[0]['lr'] = 0.1
+        else:
+            state.optimizer.param_groups[0]['lr'] = 0.01
+
+
+
         #self.loop = self.count_looper[self.rc_seq]
 
         state.model.rc_seq=self.rc_seq
