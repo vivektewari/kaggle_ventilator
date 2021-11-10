@@ -35,7 +35,7 @@ class MetricsCallback(Callback):
         self.loss_dict={}
         self.count_looper={}
         for i in range(9):
-            self.loss_dict[i]=1
+            self.loss_dict[i]=5
             self.count_looper[i]=0
 
 
@@ -93,14 +93,14 @@ class MetricsCallback(Callback):
         elif self.loss_dict[self.rc_seq]>0.5:
             state.optimizer.param_groups[0]['lr'] = 0.1
         else:
-            state.optimizer.param_groups[0]['lr'] = 0.000001
+            state.optimizer.param_groups[0]['lr'] = 0.01
 
 
 
         #self.loop = self.count_looper[self.rc_seq]
 
         state.model.rc_seq=self.rc_seq
-        state.model.update_rc_seq()
+        #state.model.update_rc_seq()
         state.loaders['train'].dataset.rc_seq=self.rc_seq
         state.loaders['valid'].dataset.rc_seq=self.rc_seq
         state.loaders['train'].dataset.update_rc_seq()

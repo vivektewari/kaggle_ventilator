@@ -89,17 +89,17 @@ class GRUModel(nn.Module):# for 1 rc value only and different fc for each seq
             self.gru_cells.append(GRUCell(input_dim, hidden_dim))
             #self.fc2.append(nn.Linear(hidden_dim, output_dim))
         self.rc_seq=rc_seq
-        self.update_rc_seq()
+        # self.update_rc_seq()
         self.activation_l = torch.nn.LeakyReLU()
 
-    def clear_rc_seq(self):
-        self.gru_cell = None
-        self.fc1 = None
-
-    def update_rc_seq(self):
-
-        self.gru_cell=self.gru_cells[self.rc_seq]
-        self.fc1=self.fc1s[self.rc_seq]
+    # def clear_rc_seq(self):
+    #     self.gru_cell = None
+    #     self.fc1 = None
+    #
+    # def update_rc_seq(self):
+    #
+    #     self.gru_cell=self.gru_cells[self.rc_seq]
+    #     self.fc1=self.fc1s[self.rc_seq]
     def forward(self, x):
 
         # Initialize hidden state with zeros
@@ -120,9 +120,9 @@ class GRUModel(nn.Module):# for 1 rc value only and different fc for each seq
         #out=torch.zeros((x.shape))
 
         for seq in range(x.size(1)):
-            hn = self.gru_cell(x[:, seq, :], hn)
+            hn = self.gru_cells[self.rc_seq](x[:, seq, :], hn)
             outs.append(hn)
-            out = self.fc1(hn)
+            out = self.fc1s[self.rc_seq](hn)
             out = self.activation_l(out)
             # out = self.fc2[seq](out)
             # out = self.activation_l(out)
