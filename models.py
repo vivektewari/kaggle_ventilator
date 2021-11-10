@@ -60,7 +60,6 @@ class fc_model(nn.Module):
         self.reset_parameters()
 
     def forward(self, x):
-        last=x
         x=self.activation(self.fc1(x))
         x=self.activation(self.fc2(x))
         x = self.activation(self.fc3(x))
@@ -73,8 +72,8 @@ class fc_model(nn.Module):
 
 
 
-class GRUModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim,seq_count, bias=True):#ori: layer_dim,
+class GRUModel(nn.Module):# for 1 rc value only and different fc for each seq
+    def __init__(self, input_dim, hidden_dim, output_dim,seq_count, rc_seq=0):#ori: layer_dim,
         super(GRUModel, self).__init__()
         # Hidden dimensions
         self.hidden_dim = hidden_dim
@@ -82,17 +81,20 @@ class GRUModel(nn.Module):
         # Number of hidden layers
         #ori self.layer_dim = layer_dim
 
-        self.gru_cell = GRUCell(input_dim, hidden_dim)#ori", layer_dim
-        self.fc1=nn.ModuleList()
+        self.gru_cells = nn.ModuleList()
+        self.fc1s=nn.ModuleList()
         #self.fc2 = nn.ModuleList()
-        for i in range(seq_count):
-            self.fc1.append(nn.Linear(hidden_dim, output_dim) )
+        for i in range(9):
+            self.fc1s.append(nn.Linear(hidden_dim, output_dim) )
+            self.gru_cells.append(GRUCell(input_dim, hidden_dim))
             #self.fc2.append(nn.Linear(hidden_dim, output_dim))
-
-
-
+        self.rc_seq=rc_seq
+        self.update_rc_seq()
         self.activation_l = torch.nn.LeakyReLU()
+    def update_rc_seq(self):
 
+        self.gru_cell=self.gru_cells[self.rc_seq]
+        self.fc1=self.fc1s[self.rc_seq]
     def forward(self, x):
 
         # Initialize hidden state with zeros
@@ -110,12 +112,12 @@ class GRUModel(nn.Module):
         outs,out = [],[]
         out_val=torch.zeros((x.shape[0],40))
         hn = h0[0, :, :]
+        #out=torch.zeros((x.shape))
 
         for seq in range(x.size(1)):
-
             hn = self.gru_cell(x[:, seq, :], hn)
             outs.append(hn)
-            out = self.fc1[seq](hn)
+            out = self.fc1(hn)
             out = self.activation_l(out)
             # out = self.fc2[seq](out)
             # out = self.activation_l(out)
@@ -123,7 +125,6 @@ class GRUModel(nn.Module):
 
 
         return out_val
-
 
 class fc_model_holder(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim,seq_count, bias=True):#ori: layer_dim,

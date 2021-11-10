@@ -13,7 +13,7 @@ from catalyst import dl
 from sklearn.model_selection import StratifiedKFold
 import torch
 def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=None,pretrained=None):
-    randSeed=23
+
     data_load = data_loader(**get_dict_from_class(data_loader_param))
     criterion = loss_func
     model = model_(**get_dict_from_class(model_param))
@@ -48,13 +48,13 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
         "train": DataLoader(data_loader( data_frame=train_file,**get_dict_from_class(data_loader_param)),
                             batch_size=2048,
                             shuffle=False,
-                            num_workers=1,
+                            num_workers=4,
                             pin_memory=True,
                             drop_last=False),
         "valid": DataLoader(data_loader(data_frame=val_file, **get_dict_from_class(data_loader_param)),
                             batch_size=2048,
                             shuffle=False,
-                            num_workers=1,
+                            num_workers=4,
                             pin_memory=True,
                             drop_last=False)
     }
@@ -83,9 +83,8 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
     # minimize_metric = False
 
 if __name__ == "__main__":
-    #from callbacks import *
+    from callbacks import MetricsCallback
 
-    # callbacks = [MetricsCallback(input_key="targets", output_key="logits",
-    #                     directory=saveDirectory, model_name='rsna'),dl.AUCCallback(
-    #       input_key="logits", target_key="targets")]
-    train(model_param,model,data_loader_param,data_loader,loss_func,callbacks=[],pretrained=pre_trained_model)
+    callbacks = [MetricsCallback(input_key="targets", output_key="logits",
+                         directory=saveDirectory, model_name='gru')]
+    train(model_param,model,data_loader_param,data_loader,loss_func,callbacks,pretrained=pre_trained_model)
