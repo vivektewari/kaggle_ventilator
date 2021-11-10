@@ -29,6 +29,8 @@ def train(model_param,model_,data_loader_param,data_loader,loss_func,callbacks=N
         model.eval()
     optimizer = optim.SGD(model.parameters(), lr=lr)
 
+    model.clear_rc_seq()
+
 
     train = data_load.data
     groups=train.breath_id.unique()

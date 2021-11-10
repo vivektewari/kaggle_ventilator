@@ -58,7 +58,7 @@ class SAKTDataset(Dataset): # borrowed from riid challange work
         # df.u_in = df.u_in/100 # -np.mean(df.u_in)) / np.std(df.u_in)
         #
         # df.time_step=df.time_step/4
-        return df.fillna(0)
+        return df.fillna(0.001)
     def get_group(self,df):
         group =df[['breath_id', 'u_in', 'pressure', 'time_step','time_step_delta']].groupby('breath_id').apply(lambda r: (
         r['u_in'].values,

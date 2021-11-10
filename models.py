@@ -91,6 +91,11 @@ class GRUModel(nn.Module):# for 1 rc value only and different fc for each seq
         self.rc_seq=rc_seq
         self.update_rc_seq()
         self.activation_l = torch.nn.LeakyReLU()
+
+    def clear_rc_seq(self):
+        self.gru_cell = None
+        self.fc1 = None
+
     def update_rc_seq(self):
 
         self.gru_cell=self.gru_cells[self.rc_seq]

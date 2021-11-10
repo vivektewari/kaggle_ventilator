@@ -41,10 +41,10 @@ def inference(model_param,model_,data_loader_param,data_loader,pretrained=None):
         except:
             model.load_state_dict(checkpoint)
         model.eval()
-
-    val_file =data_load.data
-    model.rc_seq=0
+    model.rc_seq = 0
     model.update_rc_seq()
+    val_file =data_load.data
+
 
     loaders = {
 
@@ -63,6 +63,7 @@ def inference(model_param,model_,data_loader_param,data_loader,pretrained=None):
         target_key="targets")
     # scheduler=scheduler,
     predictions=[]
+
     for rc_seq in range(9):
         runner.model.rc_seq = rc_seq
         runner.model.update_rc_seq()
